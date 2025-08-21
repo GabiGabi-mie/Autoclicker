@@ -1,4 +1,4 @@
--- Auto Clicker Script (LocalScript)
+Sexy Auto clicker
 
 -- // GUI Setup
 local ScreenGui = Instance.new("ScreenGui")
@@ -21,25 +21,34 @@ ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.Text = "Auto Click: OFF"
 ToggleButton.Parent = Frame
 
--- // Auto Clicker Logic
+-- // Auto Clicker Logic (Safe - won't trigger prompts)
 local UserInputService = game:GetService("UserInputService")
-local VirtualUser = game:GetService("VirtualUser")
 local RunService = game:GetService("RunService")
 
 local autoClicking = false
+local clickDelay = 0.1 -- adjust speed here
+
+-- Function to simulate only mouse clicks (not inputs that prompts detect)
+local function doClick()
+    local player = game.Players.LocalPlayer
+    local mouse = player:GetMouse()
+    
+    -- Fire click directly on the target if it exists
+    if mouse.Target then
+        mouse1click() -- This only simulates an actual mouse click, no prompt input
+    end
+end
 
 ToggleButton.MouseButton1Click:Connect(function()
-	autoClicking = not autoClicking
-	ToggleButton.Text = "Auto Click: " .. (autoClicking and "ON" or "OFF")
-	
-	if autoClicking then
-		-- Start auto clicking loop
-		task.spawn(function()
-			while autoClicking do
-				VirtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-				task.wait(0.1) -- delay between clicks (adjustable)
-				VirtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-			end
-		end)
-	end
+    autoClicking = not autoClicking
+    ToggleButton.Text = "Auto Click: " .. (autoClicking and "ON" or "OFF")
+
+    if autoClicking then
+        task.spawn(function()
+            while autoClicking do
+                doClick()
+                task.wait(clickDelay)
+            end
+        end)
+    end
 end)
